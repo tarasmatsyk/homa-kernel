@@ -1,6 +1,6 @@
 # ARM64 Homa kernel
 
-This repository builds Linux 6.17.8 and Homa for an ARM64 Linux VM.
+This repository builds Linux 6.17.8 and [Homa](https://github.com/PlatformLab/HomaModule) for an ARM64 Linux VM.
 It contains configuration files and build scripts. It does not contain a Linux fork.
 
 GitHub Actions uses an `ubuntu-24.04-arm` runner. Each push to `main`, pull request,
