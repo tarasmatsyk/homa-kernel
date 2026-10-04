@@ -8,6 +8,10 @@ or manual run builds the kernel. A tag such as `v6.17.8-homa.1` also creates a
 GitHub Release with the files from `dist/`. Download these files to use the
 kernel with Apple Container. Pull requests and manual runs check the build
 without publishing files. Workflow runs execute one at a time.
+The workflow uses `ccache` to reuse compiler results from earlier runs.
+The first run fills the cache. Later runs show cache hits and misses in the log.
+Run the workflow manually on the default branch to create a cache that later
+release tags and pull requests can use.
 
 ## Source references
 
@@ -38,7 +42,7 @@ sudo apt-get install -y build-essential bc bison flex libssl-dev libelf-dev dwar
 
 Use `JOBS=2 ./scripts/build.sh` to limit parallel compilation. The build downloads
 source archives and checks their SHA256 values before extraction. GitHub Actions
-versions are pinned to commit IDs. The runner packages can change. Thus, pinned
+use major version tags. The actions and runner packages can change. Thus, pinned
 source versions do not guarantee identical binary files across future builds.
 The release records compiler and linker versions in `toolchain.txt`.
 

@@ -20,8 +20,13 @@ jobs:
     timeout-minutes: 90
     permissions:
       contents: write
+    env:
+      CCACHE_DIR: ${{ runner.temp }}/ccache
+      CCACHE_BASEDIR: ${{ github.workspace }}
+      CCACHE_COMPILERCHECK: content
+      CCACHE_MAXSIZE: 2G
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@v7
       - name: Check release tag
         if: startsWith(github.ref, 'refs/tags/')
         env:
@@ -32,9 +37,27 @@ jobs:
       - name: Install build tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential bc bison flex libssl-dev libelf-dev dwarves curl xz-utils zstd kmod python3
+          sudo apt-get install -y build-essential bc bison flex libssl-dev libelf-dev dwarves curl xz-utils zstd kmod python3 ccache
+      - name: Restore compiler cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ccache-${{ runner.os }}-${{ runner.arch }}-ubuntu2404-${{ hashFiles('sources.env', 'config/*.config', 'scripts/build.sh') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            ccache-${{ runner.os }}-${{ runner.arch }}-ubuntu2404-${{ hashFiles('sources.env', 'config/*.config', 'scripts/build.sh') }}-
+            ccache-${{ runner.os }}-${{ runner.arch }}-ubuntu2404-
+      - name: Enable compiler cache
+        run: |
+          echo /usr/lib/ccache >> "$GITHUB_PATH"
+          ccache --zero-stats
       - name: Build kernel and Homa
         run: ./scripts/build.sh
+      - name: Show compiler cache statistics
+        if: always()
+        run: |
+          if command -v ccache >/dev/null; then
+            ccache --show-stats
+          fi
       - name: Publish release
         if: startsWith(github.ref, 'refs/tags/')
         env:
