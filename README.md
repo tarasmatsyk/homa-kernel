@@ -3,9 +3,11 @@
 This repository builds Linux 6.17.8 and [Homa](https://github.com/PlatformLab/HomaModule) for an ARM64 Linux VM.
 It contains configuration files and build scripts. It does not contain a Linux fork.
 
-GitHub Actions uses an `ubuntu-24.04-arm` runner. Each push to `main`, pull request,
-or manual run builds the kernel and saves the result as a workflow artifact.
-A tag such as `v6.17.8-homa.1` also creates a GitHub Release.
+GitHub Actions uses an `ubuntu-24.04-arm` runner. Each release tag, pull request,
+or manual run builds the kernel. A tag such as `v6.17.8-homa.1` also creates a
+GitHub Release with the files from `dist/`. Download these files to use the
+kernel with Apple Container. Pull requests and manual runs check the build
+without publishing files. Workflow runs execute one at a time.
 
 ## Source references
 
