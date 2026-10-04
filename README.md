@@ -61,6 +61,23 @@ versions are pinned to commit IDs. The runner packages can change. Thus, pinned
 source versions do not guarantee identical binary files across future builds.
 The release records compiler and linker versions in `toolchain.txt`.
 
+## Local checks on macOS
+
+A local test passed on 2026-10-04 with Apple Container 1.5.0 and Ubuntu 24.04 ARM64:
+
+- Linux and Homa compilation.
+- Release file checksum checks.
+- Boot with kernel release `6.17.8-homa.1`.
+- Homa module loading and unloading.
+- Homa requests and replies over loopback, with matching data at 32, 4096,
+  65536, and 1000000 bytes.
+
+For a build inside Apple Container, copy the repository files to the VM's Linux
+filesystem, such as `/root/homa-kernel`. Build there, then copy `dist/` back to a
+shared host folder. Source extraction failed when the test used a shared macOS
+folder as the build directory. The VM needed an explicit DNS server
+(`--dns 1.1.1.1`) to download packages. This test covered traffic inside one VM.
+
 ## Build files
 
 The `dist/` directory contains:
@@ -95,7 +112,7 @@ Check your installed command with `container machine create --help`. For a
 container without a machine, current Apple Container also supports:
 
 ```sh
-container run --rm -it --kernel "$PWD/vmlinux" --volume "$PWD:/kernel" ubuntu:24.04 bash
+container run --rm -it --cap-add SYS_MODULE --kernel "$PWD/vmlinux" --volume "$PWD:/kernel" ubuntu:24.04 bash
 ```
 
 In that guest, as root:
